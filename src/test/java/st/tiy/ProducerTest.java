@@ -35,7 +35,7 @@ class ProducerTest {
 	}
 
 	@Test
-	void producerFailsOnInterupptedException() throws InterruptedException {
+	void producerFailsOnInterruptedExceptionTest() throws InterruptedException {
 		queue = mock(LinkedBlockingQueue.class);
 		producer = new Producer(queue);
 

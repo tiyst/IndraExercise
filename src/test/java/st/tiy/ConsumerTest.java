@@ -13,6 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static java.lang.Thread.State.TERMINATED;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class ConsumerTest {
@@ -45,6 +46,18 @@ class ConsumerTest {
 
 			verify(repositoryMock, times(1)).getAllUsers();
 		}
+	}
+
+	@Test
+	void producerFailsOnInterruptedExceptionTest() throws InterruptedException {
+		queue = mock(LinkedBlockingQueue.class);
+		consumer = new Consumer(queue);
+
+		doThrow(new InterruptedException()).when(queue).take();
+
+		consumer.run();
+
+		assertTrue(Thread.currentThread().isInterrupted());
 	}
 
 	@Test

@@ -11,8 +11,7 @@ import st.tiy.domain.User;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class UserRepositoryTest {
@@ -44,7 +43,7 @@ class UserRepositoryTest {
 	}
 
 	@Test
-	void addUserTest() {
+	void addNewUserTest() {
 		User user = new User();
 		userRepository.addUser(user);
 
@@ -54,7 +53,7 @@ class UserRepositoryTest {
 	}
 
 	@Test
-	void testDeleteAllUsers() {
+	void repositoryDeletesAllUsersTest() {
 		userRepository.deleteAllUsers();
 
 		verify(transactionMock).begin();
@@ -63,7 +62,7 @@ class UserRepositoryTest {
 	}
 
 	@Test
-	void testGetAllUsers() {
+	void repositoryQueriesForUsersTest() {
 		TypedQuery<User> query = mock(TypedQuery.class);
 		when(entityManagerMock.createQuery("SELECT u FROM User u", User.class)).thenReturn(query);
 		when(query.getResultList()).thenReturn(Collections.emptyList());
@@ -75,7 +74,17 @@ class UserRepositoryTest {
 	}
 
 	@Test
-	void testClose() {
+	void newUserNotSavedWhenDuplicateIdTest() {
+		userRepository = UserRepository.getInstance();
+		User user1 = new User(1, "John", "Doe");
+		User user2 = new User(1, "Jane", "Doe");
+
+		userRepository.addUser(user1);
+		assertThrows(EntityExistsException.class, () -> userRepository.addUser(user2));
+	}
+
+	@Test
+	void repositoryClosesEntityManagerTest() {
 		userRepository.close();
 
 		verify(entityManagerMock).close();
@@ -83,7 +92,7 @@ class UserRepositoryTest {
 	}
 
 	@Test
-	void testSingleton() {
+	void singletonReturnsSameInstanceTest() {
 		UserRepository instance1 = UserRepository.getInstance();
 		UserRepository instance2 = UserRepository.getInstance();
 
